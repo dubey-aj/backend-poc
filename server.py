@@ -7,12 +7,14 @@ from pydantic import BaseModel
 import os
 import requests
 from client_supabase import fetch_records, update_record
+import datetime as Datetime
 
 
 app = FastAPI()
 load_dotenv()
 
 base_url = os.getenv("BASE_URL", "http://localhost:8000")
+agent_url = os.getenv("AGENT_URL", "http://localhost:8000/agent")
 
 @app.get("/initiate")
 def call_api():
@@ -24,9 +26,18 @@ def call_api():
     payload = json.dumps({
         "customer_phone": f"{phoneNumber}"
     })
-
+    
     try:
-        response = requests.post(url, data=payload, headers={"Content-Type": "application/json"},verify="C:\\Users\\sdubey\\Downloads\\genaiplatform.ajbpoc.co.uk.crt")
+        #  send record to agent
+        agent_payload = json.dumps({
+                    "cust_id": user_records[0]['cust_id'],
+                    "name": user_records[0]['name'],
+                    "phnumber": user_records[0]['phnumber'],
+                    "dob": user_records[0]['dob']
+                    })
+        response_agent = requests.post(f"{agent_url}/user-info", data=payload, headers={"Content-Type": "application/json"})
+        #  initiate call
+        response = requests.post(url, data=payload, headers={"Content-Type": "application/json"})
         response.raise_for_status()
         return response.json()
         print("END")
@@ -36,8 +47,11 @@ def call_api():
     
 class Record(BaseModel):
     cust_id: int
+    name : str
     phnumber: str
-    email: str = None
+    dob : Datetime.datetime
+    email: str
+    
 
 
 @app.put("/update-record")
