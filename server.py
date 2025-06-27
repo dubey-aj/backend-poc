@@ -41,7 +41,6 @@ def call_api():
 
     user_records = fetch_records()
     phoneNumber = user_records[0]['phnumber'] if user_records else None
-    logger.info(f"Fetched user records: {user_records}")
     
     try:
         #  send record to agent
