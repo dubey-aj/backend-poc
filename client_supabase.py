@@ -25,8 +25,7 @@ def fetch_records():
         response = requests.get(
             f"{url}/rest/v1/user_details",
             headers=headers,
-            params=params,
-            verify=r"C:\Users\sdubey\Downloads\genaiplatform.ajbpoc.co.uk.crt"
+            params=params
         )
         response.raise_for_status()
         data = response.json()
@@ -51,8 +50,7 @@ def update_record(record):
         response = requests.patch(
             f"{url}/rest/v1/user_details?cust_id=eq.{record['cust_id']}",
             headers=headers,
-            json=params,
-            verify=r"C:\Users\sdubey\Downloads\genaiplatform.ajbpoc.co.uk.crt"
+            json=params
         )
         response.raise_for_status()
         data = response.json()
