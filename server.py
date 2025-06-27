@@ -10,6 +10,16 @@ from client_supabase import fetch_records, update_record
 import datetime as Datetime
 
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('transcription_test.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
 app = FastAPI()
 load_dotenv()
 
@@ -22,10 +32,7 @@ def call_api():
 
     user_records = fetch_records()
     phoneNumber = user_records[0]['phnumber'] if user_records else None
-    print(f"Phone number fetched: {phoneNumber}")
-    payload = json.dumps({
-        "customer_phone": f"{phoneNumber}"
-    })
+    logger.info(f"Fetched user records: {user_records}")
     
     try:
         #  send record to agent
@@ -35,8 +42,14 @@ def call_api():
                     "phnumber": user_records[0]['phnumber'],
                     "dob": user_records[0]['dob']
                     })
-        response_agent = requests.post(f"{agent_url}/user-info", data=payload, headers={"Content-Type": "application/json"})
+        response_agent = requests.post(f"{agent_url}/user-info", data=agent_payload, headers={"Content-Type": "application/json"})
+
+
+        
         #  initiate call
+        payload = json.dumps({
+            "customer_phone": f"{phoneNumber}"
+        })
         response = requests.post(url, data=payload, headers={"Content-Type": "application/json"})
         response.raise_for_status()
         return response.json()
