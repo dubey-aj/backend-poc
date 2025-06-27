@@ -49,3 +49,7 @@ def update_api(record: Record):
     except requests.RequestException as e:
         logging.error(f"Error updating record: {e}")
         return PlainTextResponse("Error updating record", status_code=500)
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8080)
