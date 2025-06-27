@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import PlainTextResponse
+from fastapi.middleware.cors import CORSMiddleware
 import json
 import logging
 from dotenv import load_dotenv
@@ -9,6 +10,7 @@ import requests
 from client_supabase import fetch_records, update_record
 import datetime as Datetime
 
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,7 +23,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
-load_dotenv()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or replace * with specific domains
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 base_url = os.getenv("BASE_URL", "http://localhost:8000")
 agent_url = os.getenv("AGENT_URL", "http://localhost:8000/agent")
